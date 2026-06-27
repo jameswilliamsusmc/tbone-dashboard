@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -25,6 +27,7 @@ export default function Home() {
             ].map((item, index) => (
               <button
                 key={item}
+                type="button"
                 className={`w-full rounded-lg px-4 py-3 text-left text-sm transition ${
                   index === 0
                     ? "bg-cyan-500/10 text-cyan-300"
@@ -39,13 +42,25 @@ export default function Home() {
 
         <section className="flex-1 p-8">
           <header className="mb-8 flex items-start justify-between">
-            <div>
-              <h2 className="text-3xl font-semibold">
-                Good morning, <span className="text-cyan-400">James.</span>
-              </h2>
-              <p className="mt-2 text-slate-400">
-                T-Bone is synced, informed, and ready to execute.
-              </p>
+            <div className="flex items-center gap-4">
+              <Image
+                src="/tbone-companion.jpg"
+                alt="T-Bone"
+                width={56}
+                height={56}
+                className="h-14 w-14 rounded-full object-cover ring-2 ring-cyan-400/40"
+                priority
+              />
+
+              <div>
+                <h2 className="text-3xl font-semibold">
+                  Good morning,{" "}
+                  <span className="text-cyan-400">James.</span>
+                </h2>
+                <p className="mt-2 text-slate-400">
+                  T-Bone is synced, informed, and ready to execute.
+                </p>
+              </div>
             </div>
 
             <div className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm text-emerald-300">
@@ -64,7 +79,11 @@ export default function Home() {
                 placeholder="Ask anything. T-Bone has your context, projects, and memories."
                 className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-cyan-500"
               />
-              <button className="rounded-xl bg-cyan-400 px-6 font-medium text-slate-950 hover:bg-cyan-300">
+
+              <button
+                type="button"
+                className="rounded-xl bg-cyan-400 px-6 font-medium text-slate-950 hover:bg-cyan-300"
+              >
                 Send
               </button>
             </div>

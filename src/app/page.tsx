@@ -318,6 +318,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("command-center");
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [askAnswer, setAskAnswer] = useState("");
   const [askResults, setAskResults] = useState<MemorySearchResult[]>([]);
   const [askError, setAskError] = useState("");
   const [isAsking, setIsAsking] = useState(false);
@@ -332,6 +333,7 @@ export default function Home() {
     }
 
     setSubmittedQuestion(trimmedQuestion);
+    setAskAnswer("");
     setAskResults([]);
     setAskError("");
     setIsAsking(true);
@@ -348,6 +350,7 @@ export default function Home() {
       const data = (await response.json()) as {
         error?: string;
         query?: string;
+        answer?: string;
         results?: unknown;
       };
 
@@ -355,6 +358,7 @@ export default function Home() {
         throw new Error(data.error ?? "T-Bone could not complete the search.");
       }
 
+      setAskAnswer(data.answer?.trim() ?? "");
       setAskResults(normalizeMemoryResults(data.results ?? data));
       setQuestion("");
     } catch (error) {
@@ -571,6 +575,31 @@ export default function Home() {
               >
                 <p className="text-sm font-medium text-rose-300">
                   {askError}
+                </p>
+              </div>
+            )}
+
+            {askAnswer && (
+              <div
+                role="status"
+                className="mt-4 rounded-xl border border-cyan-400/30 bg-cyan-400/10 p-5"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-cyan-400/30 bg-slate-950 text-sm font-semibold text-cyan-300">
+                    T
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
+                      T-Bone Answer
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      Synthesized from the strongest matching memories
+                    </p>
+                  </div>
+                </div>
+
+                <p className="mt-4 whitespace-pre-line text-sm leading-7 text-slate-100">
+                  {askAnswer}
                 </p>
               </div>
             )}

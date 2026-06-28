@@ -117,6 +117,37 @@ const extractResults = (data: unknown): MemorySearchResult[] => {
   return [];
 };
 
+const buildAnswer = (
+  query: string,
+  results: MemorySearchResult[],
+) => {
+  if (results.length === 0) {
+    return "I could not find a sufficiently relevant memory for that question.";
+  }
+
+  const primary = results[0];
+  const primaryText =
+    typeof primary.content === "string" ? primary.content.trim() : "";
+
+  if (!primaryText) {
+    return `I found a relevant memory titled "${primary.title ?? "Untitled memory"}," but it does not contain a written summary yet.`;
+  }
+
+  const secondary = results[1];
+  const secondaryText =
+    typeof secondary?.content === "string" ? secondary.content.trim() : "";
+
+  if (
+    secondaryText &&
+    secondaryText !== primaryText &&
+    secondaryText.length <= 280
+  ) {
+    return `${primaryText}\n\nSupporting context: ${secondaryText}`;
+  }
+
+  return primaryText;
+};
+
 const scoreMemory = (memory: MemorySearchResult, query: string) => {
   const normalizedQuery = normalizeText(query);
   const queryTokens = [...new Set(tokenize(query))];
@@ -287,8 +318,11 @@ export async function POST(request: Request) {
       .slice(0, 10)
       .map(({ memory }) => memory);
 
+    const answer = buildAnswer(query, rankedResults);
+
     return NextResponse.json({
       query,
+      answer,
       results: rankedResults,
       candidateCount: candidates.length,
       minimumScore,

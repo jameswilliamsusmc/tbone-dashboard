@@ -88,6 +88,45 @@ const actions = [
   },
 ];
 
+const memories = [
+  {
+    title: "T-Bone dashboard front end",
+    detail:
+      "Next.js dashboard foundation, companion imagery, projects, decisions, and actions are now working.",
+    project: "T-Bone System Development",
+    type: "Project Update",
+    time: "Today, 10:42 AM",
+    accentClass: "bg-cyan-400",
+  },
+  {
+    title: "Railway remains the prototype host",
+    detail:
+      "Azure is the anticipated long-term enterprise environment for T-Bone.",
+    project: "T-Bone System Development",
+    type: "Decision",
+    time: "Yesterday, 4:15 PM",
+    accentClass: "bg-amber-400",
+  },
+  {
+    title: "Goodman HVAC system restored",
+    detail:
+      "The failed contactor was replaced and all system functions are operating as designed.",
+    project: "Goodman HVAC Troubleshooting",
+    type: "Repair Update",
+    time: "June 27, 3:30 PM",
+    accentClass: "bg-emerald-400",
+  },
+  {
+    title: "Control board replacement deferred",
+    detail:
+      "The new control board will remain on hand because the HVAC system is currently functioning normally.",
+    project: "Goodman HVAC Troubleshooting",
+    type: "Decision",
+    time: "June 27, 3:24 PM",
+    accentClass: "bg-violet-400",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -421,6 +460,69 @@ export default function Home() {
                 + Add New Action
               </button>
             </div>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  Persistent Memory
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold">
+                  Recent Memories
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                View All Memories
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {memories.map((memory) => (
+                <article
+                  key={memory.title}
+                  className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`mt-1 h-3 w-3 shrink-0 rounded-full ${memory.accentClass}`}
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <h4 className="font-medium text-slate-100">
+                          {memory.title}
+                        </h4>
+
+                        <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300">
+                          {memory.type}
+                        </span>
+                      </div>
+
+                      <p className="mt-3 text-sm leading-6 text-slate-400">
+                        {memory.detail}
+                      </p>
+
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                        <span>{memory.project}</span>
+                        <span>{memory.time}</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+            >
+              Search Memory
+            </button>
           </section>
         </section>
       </div>

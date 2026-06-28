@@ -4,6 +4,80 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 
+type MemorySearchResult = {
+  id?: string;
+  title?: string;
+  content?: string;
+  text?: string;
+  memory?: string;
+  summary?: string;
+  memory_type?: string;
+  type?: string;
+  vault?: string;
+  project_id?: string;
+  project_name?: string;
+  tags?: string[];
+  source?: string;
+  sensitivity?: string;
+  confidence?: number;
+  importance?: number;
+  effective_date?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+const formatMemoryLabel = (value?: string) => {
+  if (!value) {
+    return "Memory";
+  }
+
+  return value
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+};
+
+const formatMemoryDate = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+};
+
+const normalizeMemoryResults = (value: unknown): MemorySearchResult[] => {
+  if (Array.isArray(value)) {
+    return value.filter(
+      (item): item is MemorySearchResult =>
+        typeof item === "object" && item !== null,
+    );
+  }
+
+  if (typeof value === "object" && value !== null) {
+    const record = value as Record<string, unknown>;
+
+    for (const key of ["results", "items", "memories", "data"]) {
+      if (Array.isArray(record[key])) {
+        return record[key].filter(
+          (item): item is MemorySearchResult =>
+            typeof item === "object" && item !== null,
+        );
+      }
+    }
+  }
+
+  return [];
+};
+
 const navItems = [
   { label: "Command Center", href: "#command-center", id: "command-center" },
   { label: "Ask T-Bone", href: "#ask-tbone", id: "ask-tbone" },
@@ -244,7 +318,7 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("command-center");
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
-  const [askResults, setAskResults] = useState<unknown>(null);
+  const [askResults, setAskResults] = useState<MemorySearchResult[]>([]);
   const [askError, setAskError] = useState("");
   const [isAsking, setIsAsking] = useState(false);
 
@@ -258,7 +332,7 @@ export default function Home() {
     }
 
     setSubmittedQuestion(trimmedQuestion);
-    setAskResults(null);
+    setAskResults([]);
     setAskError("");
     setIsAsking(true);
 
@@ -281,7 +355,7 @@ export default function Home() {
         throw new Error(data.error ?? "T-Bone could not complete the search.");
       }
 
-      setAskResults(data.results ?? data);
+      setAskResults(normalizeMemoryResults(data.results ?? data));
       setQuestion("");
     } catch (error) {
       setAskError(
@@ -501,16 +575,112 @@ export default function Home() {
               </div>
             )}
 
-            {askResults !== null && (
+            {askResults.length > 0 && (
               <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4">
-                <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">
-                  Live Memory Search Results
-                </p>
-                <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-4 text-xs leading-6 text-slate-300">
-                  {JSON.stringify(askResults, null, 2)}
-                </pre>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">
+                    Live Memory Search Results
+                  </p>
+
+                  <span className="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs text-emerald-200">
+                    {askResults.length} result
+                    {askResults.length === 1 ? "" : "s"}
+                  </span>
+                </div>
+
+                <div className="mt-4 grid gap-4 xl:grid-cols-2">
+                  {askResults.map((memory, index) => {
+                    const body =
+                      memory.content ??
+                      memory.text ??
+                      memory.memory ??
+                      memory.summary ??
+                      "No memory text was returned.";
+
+                    const title =
+                      memory.title ??
+                      memory.project_name ??
+                      `Memory Result ${index + 1}`;
+
+                    const memoryType = formatMemoryLabel(
+                      memory.memory_type ?? memory.type,
+                    );
+
+                    const memoryDate =
+                      formatMemoryDate(memory.updated_at) ||
+                      formatMemoryDate(memory.created_at) ||
+                      formatMemoryDate(memory.effective_date);
+
+                    return (
+                      <article
+                        key={memory.id ?? `${title}-${index}`}
+                        className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <h4 className="font-medium text-slate-100">
+                              {title}
+                            </h4>
+
+                            {(memory.project_name || memory.vault) && (
+                              <p className="mt-1 text-xs text-slate-500">
+                                {memory.project_name ??
+                                  formatMemoryLabel(memory.vault)}
+                              </p>
+                            )}
+                          </div>
+
+                          <span className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200">
+                            {memoryType}
+                          </span>
+                        </div>
+
+                        <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-slate-300">
+                          {body}
+                        </p>
+
+                        {Array.isArray(memory.tags) &&
+                          memory.tags.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {memory.tags.slice(0, 6).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-400"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-800 pt-4 text-xs text-slate-500">
+                          <span>
+                            {memory.source
+                              ? `Source: ${formatMemoryLabel(memory.source)}`
+                              : memory.sensitivity
+                                ? `Sensitivity: ${formatMemoryLabel(memory.sensitivity)}`
+                                : "T-Bone memory"}
+                          </span>
+
+                          {memoryDate && <span>{memoryDate}</span>}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
               </div>
             )}
+
+            {!isAsking &&
+              submittedQuestion &&
+              !askError &&
+              askResults.length === 0 && (
+                <div className="mt-4 rounded-xl border border-slate-700 bg-slate-950 p-4">
+                  <p className="text-sm text-slate-400">
+                    No matching memories were found for that question.
+                  </p>
+                </div>
+              )}
           </section>
 
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">

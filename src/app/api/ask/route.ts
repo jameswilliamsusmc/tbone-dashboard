@@ -4,6 +4,194 @@ type AskRequest = {
   query?: string;
 };
 
+type MemorySearchResult = {
+  id?: string;
+  title?: string;
+  content?: string;
+  memory_type?: string;
+  vault?: string;
+  project_id?: string;
+  tags?: string[];
+  source?: string;
+  sensitivity?: string;
+  confidence?: number;
+  importance?: number;
+  effective_date?: string;
+  expires_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  [key: string]: unknown;
+};
+
+const STOP_WORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "be",
+  "by",
+  "for",
+  "from",
+  "has",
+  "have",
+  "how",
+  "i",
+  "in",
+  "is",
+  "it",
+  "me",
+  "my",
+  "of",
+  "on",
+  "or",
+  "our",
+  "the",
+  "this",
+  "to",
+  "was",
+  "what",
+  "when",
+  "where",
+  "which",
+  "who",
+  "why",
+  "with",
+  "you",
+  "your",
+]);
+
+const GENERIC_QUERY_TERMS = new Set([
+  "current",
+  "decision",
+  "decisions",
+  "latest",
+  "status",
+  "update",
+  "updates",
+  "information",
+  "details",
+  "tell",
+  "show",
+]);
+
+const normalizeText = (value: unknown) =>
+  typeof value === "string"
+    ? value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, " ")
+        .trim()
+    : "";
+
+const tokenize = (value: string) =>
+  normalizeText(value)
+    .split(/\s+/)
+    .filter((token) => token.length > 1 && !STOP_WORDS.has(token));
+
+const countOccurrences = (text: string, term: string) => {
+  if (!term) {
+    return 0;
+  }
+
+  return text.split(term).length - 1;
+};
+
+const extractResults = (data: unknown): MemorySearchResult[] => {
+  if (Array.isArray(data)) {
+    return data as MemorySearchResult[];
+  }
+
+  if (!data || typeof data !== "object") {
+    return [];
+  }
+
+  const record = data as Record<string, unknown>;
+
+  for (const key of ["results", "items", "memories", "data"]) {
+    if (Array.isArray(record[key])) {
+      return record[key] as MemorySearchResult[];
+    }
+  }
+
+  return [];
+};
+
+const scoreMemory = (memory: MemorySearchResult, query: string) => {
+  const normalizedQuery = normalizeText(query);
+  const queryTokens = [...new Set(tokenize(query))];
+
+  const title = normalizeText(memory.title);
+  const content = normalizeText(memory.content);
+  const tags = normalizeText(
+    Array.isArray(memory.tags) ? memory.tags.join(" ") : "",
+  );
+  const memoryType = normalizeText(memory.memory_type);
+  const vault = normalizeText(memory.vault);
+  const source = normalizeText(memory.source);
+
+  const combined = [title, content, tags, memoryType, vault, source]
+    .filter(Boolean)
+    .join(" ");
+
+  let score = 0;
+
+  if (normalizedQuery && title.includes(normalizedQuery)) {
+    score += 120;
+  }
+
+  if (normalizedQuery && content.includes(normalizedQuery)) {
+    score += 80;
+  }
+
+  for (const token of queryTokens) {
+    score += countOccurrences(title, token) * 18;
+    score += countOccurrences(tags, token) * 12;
+    score += countOccurrences(content, token) * 5;
+    score += countOccurrences(memoryType, token) * 4;
+    score += countOccurrences(vault, token) * 3;
+    score += countOccurrences(source, token) * 2;
+  }
+
+  const matchedTokens = queryTokens.filter((token) =>
+    combined.includes(token),
+  ).length;
+
+  if (queryTokens.length > 0) {
+    const coverage = matchedTokens / queryTokens.length;
+    score += coverage * 60;
+
+    if (coverage === 1) {
+      score += 40;
+    }
+  }
+
+  const importantPhrases = [
+    "hosting decision",
+    "prototype host",
+    "long term",
+    "railway",
+    "azure",
+    "t bone",
+  ];
+
+  for (const phrase of importantPhrases) {
+    if (normalizedQuery.includes(phrase) && combined.includes(phrase)) {
+      score += 35;
+    }
+  }
+
+  if (typeof memory.importance === "number") {
+    score += Math.min(memory.importance, 10);
+  }
+
+  if (typeof memory.confidence === "number") {
+    score += Math.min(memory.confidence, 1) * 5;
+  }
+
+  return score;
+};
+
 export async function POST(request: Request) {
   try {
     const body = (await request.json()) as AskRequest;
@@ -35,25 +223,75 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         query,
         include_sensitive: false,
-        limit: 10,
+        limit: 50,
       }),
       cache: "no-store",
     });
 
-    const data = await response.json();
+    const data = (await response.json()) as unknown;
 
     if (!response.ok) {
+      const detail =
+        data && typeof data === "object" && "detail" in data
+          ? String((data as { detail?: unknown }).detail)
+          : "The T-Bone API request failed.";
+
       return NextResponse.json(
-        {
-          error: data?.detail ?? "The T-Bone API request failed.",
-        },
+        { error: detail },
         { status: response.status },
       );
     }
 
+    const candidates = extractResults(data);
+
+    const subjectTokens = [...new Set(tokenize(query))].filter(
+      (token) => !GENERIC_QUERY_TERMS.has(token),
+    );
+
+    const scoredCandidates = candidates
+      .map((memory) => {
+        const searchableText = normalizeText(
+          [
+            memory.title,
+            memory.content,
+            Array.isArray(memory.tags) ? memory.tags.join(" ") : "",
+            memory.source,
+            memory.vault,
+          ]
+            .filter(Boolean)
+            .join(" "),
+        );
+
+        const hasSubjectMatch =
+          subjectTokens.length === 0 ||
+          subjectTokens.some((token) => searchableText.includes(token));
+
+        return {
+          memory,
+          score: scoreMemory(memory, query),
+          hasSubjectMatch,
+        };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    const topScore =
+      scoredCandidates.find(({ hasSubjectMatch }) => hasSubjectMatch)?.score ??
+      0;
+    const minimumScore = Math.max(35, topScore * 0.25);
+
+    const rankedResults = scoredCandidates
+      .filter(
+        ({ score, hasSubjectMatch }) =>
+          hasSubjectMatch && score >= minimumScore,
+      )
+      .slice(0, 10)
+      .map(({ memory }) => memory);
+
     return NextResponse.json({
       query,
-      results: data,
+      results: rankedResults,
+      candidateCount: candidates.length,
+      minimumScore,
     });
   } catch {
     return NextResponse.json(

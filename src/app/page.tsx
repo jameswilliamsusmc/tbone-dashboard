@@ -171,8 +171,8 @@ const schedule = [
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
-      <div className="flex min-h-screen">
-        <aside className="w-64 border-r border-slate-800 bg-slate-900 p-6">
+      <div className="flex min-h-screen flex-col lg:flex-row">
+        <aside className="w-full border-b border-slate-800 bg-slate-900 p-4 sm:p-6 lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r">
           <div className="mb-10">
             <h1 className="text-2xl font-bold tracking-wide text-cyan-400">
               T-BONE
@@ -182,7 +182,7 @@ export default function Home() {
             </p>
           </div>
 
-          <nav className="space-y-2">
+          <nav className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:block lg:space-y-2">
             {[
               "Command Center",
               "Ask T-Bone",
@@ -208,8 +208,8 @@ export default function Home() {
           </nav>
         </aside>
 
-        <section className="flex-1 p-8">
-          <header className="mb-8 flex items-start justify-between">
+        <section className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
+          <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
               <Image
                 src="/tbone-companion.jpg"
@@ -241,7 +241,7 @@ export default function Home() {
               Ask T-Bone
             </h3>
 
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row">
               <input
                 type="text"
                 placeholder="Ask anything. T-Bone has your context, projects, and memories."
@@ -250,7 +250,7 @@ export default function Home() {
 
               <button
                 type="button"
-                className="rounded-xl bg-cyan-400 px-6 font-medium text-slate-950 hover:bg-cyan-300"
+                className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
               >
                 Send
               </button>

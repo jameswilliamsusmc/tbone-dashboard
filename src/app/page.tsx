@@ -1,5 +1,36 @@
 import Image from "next/image";
 
+const projects = [
+  {
+    name: "NGA Defender",
+    subtitle: "Phase 2 Implementation",
+    progress: 72,
+    status: "On Track",
+    statusClass: "text-emerald-300",
+  },
+  {
+    name: "HSIN",
+    subtitle: "Platform Modernization",
+    progress: 58,
+    status: "At Risk",
+    statusClass: "text-amber-300",
+  },
+  {
+    name: "T-Bone System Development",
+    subtitle: "Core Platform and Plugins",
+    progress: 65,
+    status: "On Track",
+    statusClass: "text-emerald-300",
+  },
+  {
+    name: "Goodman HVAC Troubleshooting",
+    subtitle: "Home System Repair",
+    progress: 90,
+    status: "On Track",
+    statusClass: "text-emerald-300",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -152,6 +183,67 @@ export default function Home() {
                 </div>
               </div>
             </div>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  Portfolio
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold">Active Projects</h3>
+              </div>
+
+              <button
+                type="button"
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                View All
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {projects.map((project) => (
+                <div
+                  key={project.name}
+                  className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="font-medium text-slate-100">
+                        {project.name}
+                      </h4>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {project.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="text-right">
+                      <p className={`text-sm font-medium ${project.statusClass}`}>
+                        {project.status}
+                      </p>
+                      <p className="mt-1 text-sm text-slate-400">
+                        {project.progress}%
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
+                    <div
+                      className="h-full rounded-full bg-cyan-400"
+                      style={{ width: `${project.progress}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+            >
+              + New Project
+            </button>
           </section>
         </section>
       </div>

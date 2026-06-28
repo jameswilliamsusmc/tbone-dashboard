@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import type { FormEvent } from "react";
 
 const navItems = [
   { label: "Command Center", href: "#command-center", id: "command-center" },
@@ -241,6 +242,21 @@ const schedule = [
 
 export default function Home() {
   const [activeSection, setActiveSection] = useState("command-center");
+  const [question, setQuestion] = useState("");
+  const [submittedQuestion, setSubmittedQuestion] = useState("");
+
+  const handleAskTbone = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const trimmedQuestion = question.trim();
+
+    if (!trimmedQuestion) {
+      return;
+    }
+
+    setSubmittedQuestion(trimmedQuestion);
+    setQuestion("");
+  };
 
   useEffect(() => {
     const groupedSectionIds = new Set([
@@ -402,20 +418,45 @@ export default function Home() {
               Ask T-Bone
             </h3>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
+            <form
+              onSubmit={handleAskTbone}
+              className="flex flex-col gap-3 sm:flex-row"
+            >
               <input
                 type="text"
+                value={question}
+                onChange={(event) => setQuestion(event.target.value)}
                 placeholder="Ask anything. T-Bone has your context, projects, and memories."
+                aria-label="Ask T-Bone a question"
                 className="flex-1 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-slate-100 outline-none placeholder:text-slate-500 focus:border-cyan-500"
               />
 
               <button
-                type="button"
-                className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
+                type="submit"
+                disabled={!question.trim()}
+                className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400 sm:w-auto"
               >
                 Send
               </button>
-            </div>
+            </form>
+
+            {submittedQuestion && (
+              <div
+                role="status"
+                className="mt-4 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-4"
+              >
+                <p className="text-xs uppercase tracking-[0.2em] text-cyan-400">
+                  Submitted to T-Bone
+                </p>
+                <p className="mt-2 text-sm text-slate-200">
+                  {submittedQuestion}
+                </p>
+                <p className="mt-3 text-xs text-slate-500">
+                  Front-end submission is working. The next integration step will
+                  send this question to the T-Bone API and display the live response.
+                </p>
+              </div>
+            )}
           </section>
 
           <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">

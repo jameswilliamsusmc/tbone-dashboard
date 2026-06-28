@@ -178,7 +178,7 @@ const actions = [
   },
 ];
 
-const memories = [
+const fallbackMemories = [
   {
     title: "T-Bone dashboard front end",
     detail:
@@ -322,6 +322,11 @@ export default function Home() {
   const [askResults, setAskResults] = useState<MemorySearchResult[]>([]);
   const [askError, setAskError] = useState("");
   const [isAsking, setIsAsking] = useState(false);
+  const [recentMemories, setRecentMemories] =
+    useState<MemorySearchResult[]>([]);
+  const [recentMemoriesError, setRecentMemoriesError] = useState("");
+  const [isLoadingRecentMemories, setIsLoadingRecentMemories] =
+    useState(true);
 
   const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -371,6 +376,44 @@ export default function Home() {
       setIsAsking(false);
     }
   };
+
+  useEffect(() => {
+    const loadRecentMemories = async () => {
+      setIsLoadingRecentMemories(true);
+      setRecentMemoriesError("");
+
+      try {
+        const response = await fetch("/api/memories", {
+          cache: "no-store",
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          memories?: MemorySearchResult[];
+        };
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ?? "T-Bone could not retrieve recent memories.",
+          );
+        }
+
+        setRecentMemories(
+          Array.isArray(data.memories) ? data.memories : [],
+        );
+      } catch (error) {
+        setRecentMemoriesError(
+          error instanceof Error
+            ? error.message
+            : "T-Bone could not retrieve recent memories.",
+        );
+      } finally {
+        setIsLoadingRecentMemories(false);
+      }
+    };
+
+    void loadRecentMemories();
+  }, []);
 
   useEffect(() => {
     const groupedSectionIds = new Set([
@@ -979,37 +1022,109 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
-              {memories.map((memory) => (
-                <article
-                  key={memory.title}
-                  className="rounded-xl border border-slate-800 bg-slate-950 p-5"
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className={`mt-1 h-3 w-3 shrink-0 rounded-full ${memory.accentClass}`}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex flex-wrap items-start justify-between gap-3">
-                        <h4 className="font-medium text-slate-100">
-                          {memory.title}
-                        </h4>
-                        <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300">
-                          {memory.type}
-                        </span>
+            {isLoadingRecentMemories && (
+              <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">
+                Loading recent memories...
+              </div>
+            )}
+
+            {recentMemoriesError && (
+              <div
+                role="alert"
+                className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-5"
+              >
+                <p className="text-sm font-medium text-amber-200">
+                  {recentMemoriesError}
+                </p>
+                <p className="mt-2 text-xs text-slate-400">
+                  Showing the local sample memories for now.
+                </p>
+              </div>
+            )}
+
+            {!isLoadingRecentMemories && (
+              <div className="grid gap-4 md:grid-cols-2">
+                {(recentMemories.length > 0
+                  ? recentMemories
+                  : fallbackMemories
+                ).map((memory, index) => {
+                  const isLiveMemory = "content" in memory;
+                  const liveMemory = memory as MemorySearchResult;
+                  const fallbackMemory = memory as (typeof fallbackMemories)[number];
+
+                  const title = isLiveMemory
+                    ? liveMemory.title ?? "Untitled memory"
+                    : fallbackMemory.title;
+                  const detail = isLiveMemory
+                    ? liveMemory.content ?? "No memory content available."
+                    : fallbackMemory.detail;
+                  const type = isLiveMemory
+                    ? formatMemoryLabel(liveMemory.memory_type)
+                    : fallbackMemory.type;
+                  const context = isLiveMemory
+                    ? formatMemoryLabel(liveMemory.vault)
+                    : fallbackMemory.project;
+                  const time = isLiveMemory
+                    ? formatMemoryDate(
+                        liveMemory.updated_at ??
+                          liveMemory.created_at ??
+                          liveMemory.effective_date,
+                      )
+                    : fallbackMemory.time;
+
+                  const accentClass = isLiveMemory
+                    ? "bg-emerald-400"
+                    : fallbackMemory.accentClass;
+
+                  return (
+                    <article
+                      key={liveMemory.id ?? `${title}-${index}`}
+                      className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={`mt-1 h-3 w-3 shrink-0 rounded-full ${accentClass}`}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-start justify-between gap-3">
+                            <h4 className="font-medium text-slate-100">
+                              {title}
+                            </h4>
+                            <span className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-300">
+                              {type}
+                            </span>
+                          </div>
+
+                          <p className="mt-3 text-sm leading-6 text-slate-400">
+                            {detail}
+                          </p>
+
+                          {isLiveMemory &&
+                            Array.isArray(liveMemory.tags) &&
+                            liveMemory.tags.length > 0 && (
+                              <div className="mt-4 flex flex-wrap gap-2">
+                                {liveMemory.tags.slice(0, 5).map((tag) => (
+                                  <span
+                                    key={tag}
+                                    className="rounded-full border border-slate-700 bg-slate-900 px-3 py-1 text-xs text-slate-400"
+                                  >
+                                    {tag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+
+                          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                            <span>{context}</span>
+                            <span>{time}</span>
+                          </div>
+                        </div>
                       </div>
-                      <p className="mt-3 text-sm leading-6 text-slate-400">
-                        {memory.detail}
-                      </p>
-                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
-                        <span>{memory.project}</span>
-                        <span>{memory.time}</span>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
 
             <button
               type="button"

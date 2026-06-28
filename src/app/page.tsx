@@ -107,6 +107,52 @@ export default function Home() {
               </div>
             ))}
           </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:items-center">
+              <div className="overflow-hidden rounded-2xl border border-cyan-400/20 bg-slate-950">
+                <Image
+                  src="/tbone-companion.jpg"
+                  alt="T-Bone companion"
+                  width={500}
+                  height={500}
+                  className="h-64 w-full object-cover"
+                />
+              </div>
+
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  T-Bone Companion
+                </p>
+
+                <h3 className="mt-3 text-2xl font-semibold">
+                  Always by your side. Always working for you.
+                </h3>
+
+                <p className="mt-3 max-w-2xl text-slate-400">
+                  T-Bone is your living command-center companion—watching your
+                  projects, decisions, memories, and priorities so nothing
+                  important slips through the cracks.
+                </p>
+
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    className="rounded-xl bg-cyan-400 px-5 py-3 font-medium text-slate-950 hover:bg-cyan-300"
+                  >
+                    Plan My Day
+                  </button>
+
+                  <button
+                    type="button"
+                    className="rounded-xl border border-slate-700 px-5 py-3 font-medium text-slate-200 hover:bg-slate-800"
+                  >
+                    Show Top Priorities
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
         </section>
       </div>
     </main>

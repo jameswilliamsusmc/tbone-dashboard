@@ -1,267 +1,268 @@
 import Image from "next/image";
 
 const projects = [
-  {
-    name: "NGA Defender",
-    subtitle: "Phase 2 Implementation",
-    progress: 72,
-    status: "On Track",
-    statusClass: "text-emerald-300",
-  },
-  {
-    name: "HSIN",
-    subtitle: "Platform Modernization",
-    progress: 58,
-    status: "At Risk",
-    statusClass: "text-amber-300",
-  },
-  {
-    name: "T-Bone System Development",
-    subtitle: "Core Platform and Plugins",
-    progress: 65,
-    status: "On Track",
-    statusClass: "text-emerald-300",
-  },
-  {
-    name: "Goodman HVAC Troubleshooting",
-    subtitle: "Home System Repair",
-    progress: 90,
-    status: "On Track",
-    statusClass: "text-emerald-300",
-  },
+{
+name: "NGA Defender",
+subtitle: "Phase 2 Implementation",
+progress: 72,
+status: "On Track",
+statusClass: "text-emerald-300",
+},
+{
+name: "HSIN",
+subtitle: "Platform Modernization",
+progress: 58,
+status: "At Risk",
+statusClass: "text-amber-300",
+},
+{
+name: "T-Bone System Development",
+subtitle: "Core Platform and Plugins",
+progress: 65,
+status: "On Track",
+statusClass: "text-emerald-300",
+},
+{
+name: "Goodman HVAC Troubleshooting",
+subtitle: "Home System Repair",
+progress: 90,
+status: "On Track",
+statusClass: "text-emerald-300",
+},
 ];
 
 const decisions = [
-  {
-    title: "NGA Defender — Approve Phase 2 Budget",
-    detail: "$2.4M budget allocation for FY25 implementation.",
-    due: "Due May 20",
-    priority: "High",
-    priorityClass:
-      "border-amber-400/30 bg-amber-400/10 text-amber-300",
-  },
-  {
-    title: "HSIN — Cloud Hosting Strategy",
-    detail: "Choose between GovCloud and on-premises hybrid.",
-    due: "Due May 21",
-    priority: "High",
-    priorityClass:
-      "border-amber-400/30 bg-amber-400/10 text-amber-300",
-  },
-  {
-    title: "T-Bone — Dashboard Architecture",
-    detail: "Confirm Vercel front end with Railway API integration.",
-    due: "Due May 23",
-    priority: "Medium",
-    priorityClass:
-      "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
-  },
+{
+title: "NGA Defender — Approve Phase 2 Budget",
+detail: "$2.4M budget allocation for FY25 implementation.",
+due: "Due May 20",
+priority: "High",
+priorityClass:
+"border-amber-400/30 bg-amber-400/10 text-amber-300",
+},
+{
+title: "HSIN — Cloud Hosting Strategy",
+detail: "Choose between GovCloud and on-premises hybrid.",
+due: "Due May 21",
+priority: "High",
+priorityClass:
+"border-amber-400/30 bg-amber-400/10 text-amber-300",
+},
+{
+title: "T-Bone — Dashboard Architecture",
+detail: "Confirm Vercel front end with Railway API integration.",
+due: "Due May 23",
+priority: "Medium",
+priorityClass:
+"border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+},
 ];
 
 const actions = [
-  {
-    title: "Review NGA Defender budget draft",
-    project: "NGA Defender",
-    due: "Due Today",
-    dueClass: "text-amber-300",
-  },
-  {
-    title: "Prepare HSIN risk register",
-    project: "HSIN",
-    due: "Due Today",
-    dueClass: "text-amber-300",
-  },
-  {
-    title: "Approve T-Bone dashboard schema",
-    project: "T-Bone System Development",
-    due: "May 21",
-    dueClass: "text-cyan-300",
-  },
-  {
-    title: "Replace HVAC float switch",
-    project: "Goodman HVAC Troubleshooting",
-    due: "May 22",
-    dueClass: "text-cyan-300",
-  },
-  {
-    title: "Send Q2 planning deck to team",
-    project: "General",
-    due: "May 23",
-    dueClass: "text-slate-300",
-  },
+{
+title: "Review NGA Defender budget draft",
+project: "NGA Defender",
+due: "Due Today",
+dueClass: "text-amber-300",
+},
+{
+title: "Prepare HSIN risk register",
+project: "HSIN",
+due: "Due Today",
+dueClass: "text-amber-300",
+},
+{
+title: "Approve T-Bone dashboard schema",
+project: "T-Bone System Development",
+due: "May 21",
+dueClass: "text-cyan-300",
+},
+{
+title: "Replace HVAC float switch",
+project: "Goodman HVAC Troubleshooting",
+due: "May 22",
+dueClass: "text-cyan-300",
+},
+{
+title: "Send Q2 planning deck to team",
+project: "General",
+due: "May 23",
+dueClass: "text-slate-300",
+},
 ];
 
 const memories = [
-  {
-    title: "T-Bone dashboard front end",
-    detail:
-      "Next.js dashboard foundation, companion imagery, projects, decisions, and actions are now working.",
-    project: "T-Bone System Development",
-    type: "Project Update",
-    time: "Today, 10:42 AM",
-    accentClass: "bg-cyan-400",
-  },
-  {
-    title: "Railway remains the prototype host",
-    detail:
-      "Azure is the anticipated long-term enterprise environment for T-Bone.",
-    project: "T-Bone System Development",
-    type: "Decision",
-    time: "Yesterday, 4:15 PM",
-    accentClass: "bg-amber-400",
-  },
-  {
-    title: "Goodman HVAC system restored",
-    detail:
-      "The failed contactor was replaced and all system functions are operating as designed.",
-    project: "Goodman HVAC Troubleshooting",
-    type: "Repair Update",
-    time: "June 27, 3:30 PM",
-    accentClass: "bg-emerald-400",
-  },
-  {
-    title: "Control board replacement deferred",
-    detail:
-      "The new control board will remain on hand because the HVAC system is currently functioning normally.",
-    project: "Goodman HVAC Troubleshooting",
-    type: "Decision",
-    time: "June 27, 3:24 PM",
-    accentClass: "bg-violet-400",
-  },
+{
+title: "T-Bone dashboard front end",
+detail:
+"Next.js dashboard foundation, companion imagery, projects, decisions, and actions are now working.",
+project: "T-Bone System Development",
+type: "Project Update",
+time: "Today, 10:42 AM",
+accentClass: "bg-cyan-400",
+},
+{
+title: "Railway remains the prototype host",
+detail:
+"Azure is the anticipated long-term enterprise environment for T-Bone.",
+project: "T-Bone System Development",
+type: "Decision",
+time: "Yesterday, 4:15 PM",
+accentClass: "bg-amber-400",
+},
+{
+title: "Goodman HVAC system restored",
+detail:
+"The failed contactor was replaced and all system functions are operating as designed.",
+project: "Goodman HVAC Troubleshooting",
+type: "Repair Update",
+time: "June 27, 3:30 PM",
+accentClass: "bg-emerald-400",
+},
+{
+title: "Control board replacement deferred",
+detail:
+"The new control board will remain on hand because the HVAC system is currently functioning normally.",
+project: "Goodman HVAC Troubleshooting",
+type: "Decision",
+time: "June 27, 3:24 PM",
+accentClass: "bg-violet-400",
+},
 ];
 
 const vaults = [
-  {
-    name: "Corporate Operations",
-    detail: "Leadership, staffing, contracts, and internal business records.",
-    items: 128,
-    status: "Secure",
-    statusClass: "text-emerald-300",
-  },
-  {
-    name: "Capture & Proposals",
-    detail: "Active pursuits, proposal artifacts, teaming, and submissions.",
-    items: 76,
-    status: "Secure",
-    statusClass: "text-emerald-300",
-  },
-  {
-    name: "Personal Projects",
-    detail: "Home, travel, music, equipment, and personal planning records.",
-    items: 42,
-    status: "Private",
-    statusClass: "text-cyan-300",
-  },
-  {
-    name: "T-Bone System",
-    detail: "Architecture, development notes, decisions, and technical assets.",
-    items: 31,
-    status: "Encrypted",
-    statusClass: "text-violet-300",
-  },
+{
+name: "Corporate Operations",
+detail: "Leadership, staffing, contracts, and internal business records.",
+items: 128,
+status: "Secure",
+statusClass: "text-emerald-300",
+},
+{
+name: "Capture & Proposals",
+detail: "Active pursuits, proposal artifacts, teaming, and submissions.",
+items: 76,
+status: "Secure",
+statusClass: "text-emerald-300",
+},
+{
+name: "Personal Projects",
+detail: "Home, travel, music, equipment, and personal planning records.",
+items: 42,
+status: "Private",
+statusClass: "text-cyan-300",
+},
+{
+name: "T-Bone System",
+detail: "Architecture, development notes, decisions, and technical assets.",
+items: 31,
+status: "Encrypted",
+statusClass: "text-violet-300",
+},
 ];
 
 const settings = [
-  {
-    name: "Private Mode",
-    detail: "Keep personal context and memory access restricted.",
-    value: "On",
-    valueClass: "text-emerald-300",
-  },
-  {
-    name: "Daily Briefing",
-    detail: "Prepare a morning summary of priorities, meetings, and actions.",
-    value: "Enabled",
-    valueClass: "text-cyan-300",
-  },
-  {
-    name: "Memory Capture",
-    detail: "Save important project updates, decisions, and preferences.",
-    value: "Automatic",
-    valueClass: "text-violet-300",
-  },
-  {
-    name: "Calendar Sync",
-    detail: "Connect scheduled meetings and time-sensitive commitments.",
-    value: "Pending",
-    valueClass: "text-amber-300",
-  },
+{
+name: "Private Mode",
+detail: "Keep personal context and memory access restricted.",
+value: "On",
+valueClass: "text-emerald-300",
+},
+{
+name: "Daily Briefing",
+detail: "Prepare a morning summary of priorities, meetings, and actions.",
+value: "Enabled",
+valueClass: "text-cyan-300",
+},
+{
+name: "Memory Capture",
+detail: "Save important project updates, decisions, and preferences.",
+value: "Automatic",
+valueClass: "text-violet-300",
+},
+{
+name: "Calendar Sync",
+detail: "Connect scheduled meetings and time-sensitive commitments.",
+value: "Pending",
+valueClass: "text-amber-300",
+},
 ];
 
 const schedule = [
-  {
-    time: "9:00 AM",
-    endTime: "9:30 AM",
-    title: "Executive Operations Check-In",
-    detail: "Daily priorities, staffing updates, and customer issues.",
-    location: "Microsoft Teams",
-    type: "Leadership",
-    typeClass:
-      "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
-  },
-  {
-    time: "10:30 AM",
-    endTime: "11:30 AM",
-    title: "NGA Defender Program Review",
-    detail: "Review funding, staffing, deliverables, and open risks.",
-    location: "RiVidium HQ",
-    type: "Program",
-    typeClass:
-      "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
-  },
-  {
-    time: "1:00 PM",
-    endTime: "1:45 PM",
-    title: "HSIN Capture Strategy",
-    detail: "Align response strategy, partner roles, and submission actions.",
-    location: "Microsoft Teams",
-    type: "Capture",
-    typeClass:
-      "border-amber-400/30 bg-amber-400/10 text-amber-300",
-  },
-  {
-    time: "3:00 PM",
-    endTime: "3:30 PM",
-    title: "T-Bone Development Session",
-    detail: "Continue dashboard build and front-end integration planning.",
-    location: "Private Work Session",
-    type: "Development",
-    typeClass:
-      "border-violet-400/30 bg-violet-400/10 text-violet-300",
-  },
+{
+time: "9:00 AM",
+endTime: "9:30 AM",
+title: "Executive Operations Check-In",
+detail: "Daily priorities, staffing updates, and customer issues.",
+location: "Microsoft Teams",
+type: "Leadership",
+typeClass:
+"border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+},
+{
+time: "10:30 AM",
+endTime: "11:30 AM",
+title: "NGA Defender Program Review",
+detail: "Review funding, staffing, deliverables, and open risks.",
+location: "RiVidium HQ",
+type: "Program",
+typeClass:
+"border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+},
+{
+time: "1:00 PM",
+endTime: "1:45 PM",
+title: "HSIN Capture Strategy",
+detail: "Align response strategy, partner roles, and submission actions.",
+location: "Microsoft Teams",
+type: "Capture",
+typeClass:
+"border-amber-400/30 bg-amber-400/10 text-amber-300",
+},
+{
+time: "3:00 PM",
+endTime: "3:30 PM",
+title: "T-Bone Development Session",
+detail: "Continue dashboard build and front-end integration planning.",
+location: "Private Work Session",
+type: "Development",
+typeClass:
+"border-violet-400/30 bg-violet-400/10 text-violet-300",
+},
 ];
 
 export default function Home() {
-  return (<main className="min-h-screen bg-slate-950 text-slate-100"> <div className="flex min-h-screen flex-col lg:flex-row"> <aside className="w-full border-b border-slate-800 bg-slate-900 p-4 sm:p-6 lg:min-h-screen lg:w-64 lg:border-b-0 lg:border-r"> <div className="mb-10"> <h1 className="text-2xl font-bold tracking-wide text-cyan-400">
-    T-BONE </h1> <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
-      AI Chief of Staff </p> </div>
+return ( <main className="min-h-screen bg-slate-950 text-slate-100"> <div className="flex min-h-screen flex-col lg:flex-row"> <aside className="w-full border-b border-slate-800 bg-slate-900 p-4 sm:p-6 lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:shrink-0 lg:overflow-y-auto lg:border-b-0 lg:border-r"> <div className="mb-10"> <h1 className="text-2xl font-bold tracking-wide text-cyan-400">
+T-BONE </h1> <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
+AI Chief of Staff </p> </div>
 
-    ```
-    <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:block lg:space-y-2">
-      {[
-        { label: "Command Center", href: "#command-center" },
-        { label: "Ask T-Bone", href: "#ask-tbone" },
-        { label: "Projects", href: "#projects" },
-        { label: "Actions", href: "#actions" },
-        { label: "Decisions", href: "#decisions" },
-        { label: "Memories", href: "#memories" },
-        { label: "Vaults", href: "#vaults" },
-        { label: "Settings", href: "#settings" },
-        { label: "Schedule", href: "#schedule" },
-      ].map((item, index) => (
-        <a
-          key={item.label}
-          href={item.href}
-          className={`block w-full rounded-lg px-4 py-3 text-left text-sm transition ${index === 0
-              ? "bg-cyan-500/10 text-cyan-300"
-              : "text-slate-300 hover:bg-slate-800"
+```
+      <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:block lg:space-y-2">
+        {[
+          { label: "Command Center", href: "#command-center" },
+          { label: "Ask T-Bone", href: "#ask-tbone" },
+          { label: "Projects", href: "#projects" },
+          { label: "Actions", href: "#actions" },
+          { label: "Decisions", href: "#decisions" },
+          { label: "Memories", href: "#memories" },
+          { label: "Vaults", href: "#vaults" },
+          { label: "Settings", href: "#settings" },
+          { label: "Schedule", href: "#schedule" },
+        ].map((item, index) => (
+          <a
+            key={item.label}
+            href={item.href}
+            className={`block w-full rounded-lg px-4 py-3 text-left text-sm transition ${
+              index === 0
+                ? "bg-cyan-500/10 text-cyan-300"
+                : "text-slate-300 hover:bg-slate-800"
             }`}
-        >
-          {item.label}
-        </a>
-      ))}
-    </nav>
-  </aside>
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+    </aside>
 
     <section
       id="command-center"
@@ -821,6 +822,6 @@ export default function Home() {
       </section>
     </section>
   </div>
-  </main>
+</main>
 );
 }

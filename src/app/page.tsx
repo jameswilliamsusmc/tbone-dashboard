@@ -26,6 +26,16 @@ type MemorySearchResult = {
   updated_at?: string;
 };
 
+type ProjectRecord = {
+  id?: string;
+  name?: string;
+  description?: string;
+  vault?: string;
+  status?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 const formatMemoryLabel = (value?: string) => {
   if (!value) {
     return "Memory";
@@ -90,7 +100,7 @@ const navItems = [
   { label: "Schedule", href: "#schedule", id: "schedule" },
 ];
 
-const projects = [
+const fallbackProjects = [
   {
     name: "NGA Defender",
     subtitle: "Phase 2 Implementation",
@@ -327,6 +337,10 @@ export default function Home() {
   const [recentMemoriesError, setRecentMemoriesError] = useState("");
   const [isLoadingRecentMemories, setIsLoadingRecentMemories] =
     useState(true);
+  const [activeProjects, setActiveProjects] = useState<ProjectRecord[]>([]);
+  const [activeProjectsError, setActiveProjectsError] = useState("");
+  const [isLoadingActiveProjects, setIsLoadingActiveProjects] =
+    useState(true);
 
   const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -376,6 +390,44 @@ export default function Home() {
       setIsAsking(false);
     }
   };
+
+  useEffect(() => {
+    const loadActiveProjects = async () => {
+      setIsLoadingActiveProjects(true);
+      setActiveProjectsError("");
+
+      try {
+        const response = await fetch("/api/projects", {
+          cache: "no-store",
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          projects?: ProjectRecord[];
+        };
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ?? "T-Bone could not retrieve active projects.",
+          );
+        }
+
+        setActiveProjects(
+          Array.isArray(data.projects) ? data.projects : [],
+        );
+      } catch (error) {
+        setActiveProjectsError(
+          error instanceof Error
+            ? error.message
+            : "T-Bone could not retrieve active projects.",
+        );
+      } finally {
+        setIsLoadingActiveProjects(false);
+      }
+    };
+
+    void loadActiveProjects();
+  }, []);
 
   useEffect(() => {
     const loadRecentMemories = async () => {
@@ -840,41 +892,86 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {projects.map((project) => (
-                  <div
-                    key={project.name}
-                    className="rounded-xl border border-slate-800 bg-slate-950 p-5"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h4 className="font-medium text-slate-100">
-                          {project.name}
-                        </h4>
-                        <p className="mt-1 text-sm text-slate-500">
-                          {project.subtitle}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p
-                          className={`text-sm font-medium ${project.statusClass}`}
-                        >
-                          {project.status}
-                        </p>
-                        <p className="mt-1 text-sm text-slate-400">
-                          {project.progress}%
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
-                      <div
-                        className="h-full rounded-full bg-cyan-400"
-                        style={{ width: `${project.progress}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+              {isLoadingActiveProjects && (
+                <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">
+                  Loading active projects...
+                </div>
+              )}
+
+              {activeProjectsError && (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-5"
+                >
+                  <p className="text-sm font-medium text-amber-200">
+                    {activeProjectsError}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Showing the local sample projects for now.
+                  </p>
+                </div>
+              )}
+
+              {!isLoadingActiveProjects && (
+                <div className="space-y-4">
+                  {(activeProjects.length > 0
+                    ? activeProjects
+                    : fallbackProjects
+                  ).map((project, index) => {
+                    const isLiveProject = "description" in project;
+                    const liveProject = project as ProjectRecord;
+                    const fallbackProject =
+                      project as (typeof fallbackProjects)[number];
+
+                    const name = isLiveProject
+                      ? liveProject.name ?? "Untitled project"
+                      : fallbackProject.name;
+                    const description = isLiveProject
+                      ? liveProject.description ??
+                        "No project description available."
+                      : fallbackProject.subtitle;
+                    const status = isLiveProject
+                      ? formatMemoryLabel(liveProject.status ?? "active")
+                      : fallbackProject.status;
+                    const context = isLiveProject
+                      ? formatMemoryLabel(liveProject.vault)
+                      : `${fallbackProject.progress}% complete`;
+                    const updated = isLiveProject
+                      ? formatMemoryDate(
+                          liveProject.updated_at ??
+                            liveProject.created_at,
+                        )
+                      : "";
+
+                    return (
+                      <article
+                        key={liveProject.id ?? `${name}-${index}`}
+                        className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-slate-100">
+                              {name}
+                            </h4>
+                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                              {description}
+                            </p>
+                          </div>
+
+                          <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-300">
+                            {status}
+                          </span>
+                        </div>
+
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                          <span>{context}</span>
+                          {updated && <span>{updated}</span>}
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
 
               <button
                 type="button"

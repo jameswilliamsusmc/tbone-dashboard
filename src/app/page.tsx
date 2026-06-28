@@ -184,31 +184,31 @@ export default function Home() {
 
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:block lg:space-y-2">
             {[
-              "Command Center",
-              "Ask T-Bone",
-              "Projects",
-              "Actions",
-              "Decisions",
-              "Memories",
-              "Vaults",
-              "Settings",
+              { label: "Command Center", href: "#command-center" },
+              { label: "Ask T-Bone", href: "#ask-tbone" },
+              { label: "Projects", href: "#projects" },
+              { label: "Actions", href: "#actions" },
+              { label: "Decisions", href: "#decisions" },
+              { label: "Memories", href: "#memories" },
+              { label: "Vaults", href: "#" },
+              { label: "Settings", href: "#" },
             ].map((item, index) => (
-              <button
-                key={item}
-                type="button"
-                className={`w-full rounded-lg px-4 py-3 text-left text-sm transition ${
-                  index === 0
-                    ? "bg-cyan-500/10 text-cyan-300"
-                    : "text-slate-300 hover:bg-slate-800"
-                }`}
+              <a
+                key={item.label}
+                href={item.href}
+                className={`block w-full rounded-lg px-4 py-3 text-left text-sm transition ${index === 0
+                  ? "bg-cyan-500/10 text-cyan-300"
+                  : "text-slate-300 hover:bg-slate-800"
+                  }`}
               >
-                {item}
-              </button>
+                {item.label}
+              </a>
             ))}
           </nav>
         </aside>
 
-        <section className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
+        <section id="command-center"
+          className="min-w-0 flex-1 scroll-mt-6 p-4 sm:p-6 lg:p-8">
           <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
               <Image
@@ -236,7 +236,9 @@ export default function Home() {
             </div>
           </header>
 
-          <section className="mb-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <section id="ask-tbone"
+            className="mb-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+          >
             <h3 className="mb-4 text-xl font-medium text-cyan-300">
               Ask T-Bone
             </h3>
@@ -250,7 +252,7 @@ export default function Home() {
 
               <button
                 type="button"
-                className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
+                className="rounded-xl bg-cyan-400 px-6 font-medium text-slate-950 hover:bg-cyan-300w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
               >
                 Send
               </button>
@@ -323,7 +325,9 @@ export default function Home() {
           </section>
 
           <section className="mt-8 grid gap-8 xl:grid-cols-3">
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div id="projects"
+              className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+            >
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
@@ -388,7 +392,9 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div id="actions"
+              className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+            >
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
@@ -445,7 +451,9 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div id="decisions"
+              className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+            >
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
@@ -566,7 +574,9 @@ export default function Home() {
             </button>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <section id="memories"
+            className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+          >
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">

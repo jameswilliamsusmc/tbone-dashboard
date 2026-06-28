@@ -55,6 +55,39 @@ const decisions = [
   },
 ];
 
+const actions = [
+  {
+    title: "Review NGA Defender budget draft",
+    project: "NGA Defender",
+    due: "Due Today",
+    dueClass: "text-amber-300",
+  },
+  {
+    title: "Prepare HSIN risk register",
+    project: "HSIN",
+    due: "Due Today",
+    dueClass: "text-amber-300",
+  },
+  {
+    title: "Approve T-Bone dashboard schema",
+    project: "T-Bone System Development",
+    due: "May 21",
+    dueClass: "text-cyan-300",
+  },
+  {
+    title: "Replace HVAC float switch",
+    project: "Goodman HVAC Troubleshooting",
+    due: "May 22",
+    dueClass: "text-cyan-300",
+  },
+  {
+    title: "Send Q2 planning deck to team",
+    project: "General",
+    due: "May 23",
+    dueClass: "text-slate-300",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -209,7 +242,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-8 grid gap-8 xl:grid-cols-2">
+          <section className="mt-8 grid gap-8 xl:grid-cols-3">
             <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
               <div className="mb-6 flex items-center justify-between">
                 <div>
@@ -329,6 +362,63 @@ export default function Home() {
                 className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
               >
                 Review Decisions
+              </button>
+            </div>
+
+            <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                    Execution
+                  </p>
+                  <h3 className="mt-2 text-2xl font-semibold">Open Actions</h3>
+                </div>
+
+                <button
+                  type="button"
+                  className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+                >
+                  View All
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {actions.map((action) => (
+                  <div
+                    key={action.title}
+                    className="rounded-xl border border-slate-800 bg-slate-950 p-4"
+                  >
+                    <div className="flex items-start gap-3">
+                      <input
+                        type="checkbox"
+                        aria-label={`Mark ${action.title} complete`}
+                        className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-900 accent-cyan-400"
+                      />
+
+                      <div className="min-w-0 flex-1">
+                        <h4 className="font-medium text-slate-100">
+                          {action.title}
+                        </h4>
+                        <p className="mt-1 text-sm text-slate-500">
+                          Project: {action.project}
+                        </p>
+                      </div>
+
+                      <p
+                        className={`whitespace-nowrap text-xs font-medium ${action.dueClass}`}
+                      >
+                        {action.due}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+              >
+                + Add New Action
               </button>
             </div>
           </section>

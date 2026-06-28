@@ -244,18 +244,54 @@ export default function Home() {
   const [activeSection, setActiveSection] = useState("command-center");
   const [question, setQuestion] = useState("");
   const [submittedQuestion, setSubmittedQuestion] = useState("");
+  const [askResults, setAskResults] = useState<unknown>(null);
+  const [askError, setAskError] = useState("");
+  const [isAsking, setIsAsking] = useState(false);
 
-  const handleAskTbone = (event: FormEvent<HTMLFormElement>) => {
+  const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const trimmedQuestion = question.trim();
 
-    if (!trimmedQuestion) {
+    if (!trimmedQuestion || isAsking) {
       return;
     }
 
     setSubmittedQuestion(trimmedQuestion);
-    setQuestion("");
+    setAskResults(null);
+    setAskError("");
+    setIsAsking(true);
+
+    try {
+      const response = await fetch("/api/ask", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: trimmedQuestion }),
+      });
+
+      const data = (await response.json()) as {
+        error?: string;
+        query?: string;
+        results?: unknown;
+      };
+
+      if (!response.ok) {
+        throw new Error(data.error ?? "T-Bone could not complete the search.");
+      }
+
+      setAskResults(data.results ?? data);
+      setQuestion("");
+    } catch (error) {
+      setAskError(
+        error instanceof Error
+          ? error.message
+          : "T-Bone could not complete the search.",
+      );
+    } finally {
+      setIsAsking(false);
+    }
   };
 
   useEffect(() => {
@@ -433,10 +469,10 @@ export default function Home() {
 
               <button
                 type="submit"
-                disabled={!question.trim()}
+                disabled={!question.trim() || isAsking}
                 className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:bg-slate-700 disabled:text-slate-400 sm:w-auto"
               >
-                Send
+                {isAsking ? "Searching..." : "Send"}
               </button>
             </form>
 
@@ -446,15 +482,33 @@ export default function Home() {
                 className="mt-4 rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-4"
               >
                 <p className="text-xs uppercase tracking-[0.2em] text-cyan-400">
-                  Submitted to T-Bone
+                  Asked T-Bone
                 </p>
                 <p className="mt-2 text-sm text-slate-200">
                   {submittedQuestion}
                 </p>
-                <p className="mt-3 text-xs text-slate-500">
-                  Front-end submission is working. The next integration step will
-                  send this question to the T-Bone API and display the live response.
+              </div>
+            )}
+
+            {askError && (
+              <div
+                role="alert"
+                className="mt-4 rounded-xl border border-rose-400/30 bg-rose-400/10 p-4"
+              >
+                <p className="text-sm font-medium text-rose-300">
+                  {askError}
                 </p>
+              </div>
+            )}
+
+            {askResults !== null && (
+              <div className="mt-4 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">
+                  Live Memory Search Results
+                </p>
+                <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-4 text-xs leading-6 text-slate-300">
+                  {JSON.stringify(askResults, null, 2)}
+                </pre>
               </div>
             )}
           </section>

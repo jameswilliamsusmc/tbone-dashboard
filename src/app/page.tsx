@@ -127,6 +127,47 @@ const memories = [
   },
 ];
 
+const schedule = [
+  {
+    time: "9:00 AM",
+    endTime: "9:30 AM",
+    title: "Executive Operations Check-In",
+    detail: "Daily priorities, staffing updates, and customer issues.",
+    location: "Microsoft Teams",
+    type: "Leadership",
+    typeClass: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+  },
+  {
+    time: "10:30 AM",
+    endTime: "11:30 AM",
+    title: "NGA Defender Program Review",
+    detail: "Review funding, staffing, deliverables, and open risks.",
+    location: "RiVidium HQ",
+    type: "Program",
+    typeClass:
+      "border-emerald-400/30 bg-emerald-400/10 text-emerald-300",
+  },
+  {
+    time: "1:00 PM",
+    endTime: "1:45 PM",
+    title: "HSIN Capture Strategy",
+    detail: "Align response strategy, partner roles, and submission actions.",
+    location: "Microsoft Teams",
+    type: "Capture",
+    typeClass: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+  },
+  {
+    time: "3:00 PM",
+    endTime: "3:30 PM",
+    title: "T-Bone Development Session",
+    detail: "Continue dashboard build and front-end integration planning.",
+    location: "Private Work Session",
+    type: "Development",
+    typeClass:
+      "border-violet-400/30 bg-violet-400/10 text-violet-300",
+  },
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -522,6 +563,69 @@ export default function Home() {
               className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
             >
               Search Memory
+            </button>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  Calendar
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold">
+                  Today&apos;s Schedule
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                Open Calendar
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {schedule.map((meeting) => (
+                <article
+                  key={`${meeting.time}-${meeting.title}`}
+                  className="grid gap-4 rounded-xl border border-slate-800 bg-slate-950 p-5 md:grid-cols-[110px_1fr_auto] md:items-center"
+                >
+                  <div>
+                    <p className="font-semibold text-cyan-300">
+                      {meeting.time}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-500">
+                      {meeting.endTime}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h4 className="font-medium text-slate-100">
+                      {meeting.title}
+                    </h4>
+                    <p className="mt-2 text-sm text-slate-400">
+                      {meeting.detail}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {meeting.location}
+                    </p>
+                  </div>
+
+                  <span
+                    className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${meeting.typeClass}`}
+                  >
+                    {meeting.type}
+                  </span>
+                </article>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+            >
+              + Schedule Meeting
             </button>
           </section>
         </section>

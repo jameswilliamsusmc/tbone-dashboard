@@ -126,7 +126,36 @@ const memories = [
     accentClass: "bg-violet-400",
   },
 ];
-
+const vaults = [
+  {
+    name: "Corporate Operations",
+    detail: "Leadership, staffing, contracts, and internal business records.",
+    items: 128,
+    status: "Secure",
+    statusClass: "text-emerald-300",
+  },
+  {
+    name: "Capture & Proposals",
+    detail: "Active pursuits, proposal artifacts, teaming, and submissions.",
+    items: 76,
+    status: "Secure",
+    statusClass: "text-emerald-300",
+  },
+  {
+    name: "Personal Projects",
+    detail: "Home, travel, music, equipment, and personal planning records.",
+    items: 42,
+    status: "Private",
+    statusClass: "text-cyan-300",
+  },
+  {
+    name: "T-Bone System",
+    detail: "Architecture, development notes, decisions, and technical assets.",
+    items: 31,
+    status: "Encrypted",
+    statusClass: "text-violet-300",
+  },
+];
 const schedule = [
   {
     time: "9:00 AM",
@@ -573,7 +602,59 @@ export default function Home() {
               Search Memory
             </button>
           </section>
+          <section
+            id="vaults"
+            className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  Secure Knowledge
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold">Vaults</h3>
+              </div>
 
+              <button
+                type="button"
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                Manage Vaults
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {vaults.map((vault) => (
+                <article
+                  key={vault.name}
+                  className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="font-medium text-slate-100">{vault.name}</h4>
+                      <p className="mt-2 text-sm leading-6 text-slate-400">
+                        {vault.detail}
+                      </p>
+                    </div>
+
+                    <span className={`text-sm font-medium ${vault.statusClass}`}>
+                      {vault.status}
+                    </span>
+                  </div>
+
+                  <p className="mt-4 text-xs uppercase tracking-wide text-slate-500">
+                    {vault.items} stored items
+                  </p>
+                </article>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+            >
+              + Create New Vault
+            </button>
+          </section>
           <section id="memories"
             className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
           >

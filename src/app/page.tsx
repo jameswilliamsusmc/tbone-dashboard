@@ -37,21 +37,24 @@ const decisions = [
     detail: "$2.4M budget allocation for FY25 implementation.",
     due: "Due May 20",
     priority: "High",
-    priorityClass: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+    priorityClass:
+      "border-amber-400/30 bg-amber-400/10 text-amber-300",
   },
   {
     title: "HSIN — Cloud Hosting Strategy",
     detail: "Choose between GovCloud and on-premises hybrid.",
     due: "Due May 21",
     priority: "High",
-    priorityClass: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+    priorityClass:
+      "border-amber-400/30 bg-amber-400/10 text-amber-300",
   },
   {
     title: "T-Bone — Dashboard Architecture",
     detail: "Confirm Vercel front end with Railway API integration.",
     due: "Due May 23",
     priority: "Medium",
-    priorityClass: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+    priorityClass:
+      "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
   },
 ];
 
@@ -126,6 +129,7 @@ const memories = [
     accentClass: "bg-violet-400",
   },
 ];
+
 const vaults = [
   {
     name: "Corporate Operations",
@@ -156,6 +160,34 @@ const vaults = [
     statusClass: "text-violet-300",
   },
 ];
+
+const settings = [
+  {
+    name: "Private Mode",
+    detail: "Keep personal context and memory access restricted.",
+    value: "On",
+    valueClass: "text-emerald-300",
+  },
+  {
+    name: "Daily Briefing",
+    detail: "Prepare a morning summary of priorities, meetings, and actions.",
+    value: "Enabled",
+    valueClass: "text-cyan-300",
+  },
+  {
+    name: "Memory Capture",
+    detail: "Save important project updates, decisions, and preferences.",
+    value: "Automatic",
+    valueClass: "text-violet-300",
+  },
+  {
+    name: "Calendar Sync",
+    detail: "Connect scheduled meetings and time-sensitive commitments.",
+    value: "Pending",
+    valueClass: "text-amber-300",
+  },
+];
+
 const schedule = [
   {
     time: "9:00 AM",
@@ -164,7 +196,8 @@ const schedule = [
     detail: "Daily priorities, staffing updates, and customer issues.",
     location: "Microsoft Teams",
     type: "Leadership",
-    typeClass: "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
+    typeClass:
+      "border-cyan-400/30 bg-cyan-400/10 text-cyan-300",
   },
   {
     time: "10:30 AM",
@@ -183,7 +216,8 @@ const schedule = [
     detail: "Align response strategy, partner roles, and submission actions.",
     location: "Microsoft Teams",
     type: "Capture",
-    typeClass: "border-amber-400/30 bg-amber-400/10 text-amber-300",
+    typeClass:
+      "border-amber-400/30 bg-amber-400/10 text-amber-300",
   },
   {
     time: "3:00 PM",
@@ -219,16 +253,17 @@ export default function Home() {
               { label: "Actions", href: "#actions" },
               { label: "Decisions", href: "#decisions" },
               { label: "Memories", href: "#memories" },
-              { label: "Vaults", href: "#" },
-              { label: "Settings", href: "#" },
+              { label: "Vaults", href: "#vaults" },
+              { label: "Settings", href: "#settings" },
             ].map((item, index) => (
               <a
                 key={item.label}
                 href={item.href}
-                className={`block w-full rounded-lg px-4 py-3 text-left text-sm transition ${index === 0
-                  ? "bg-cyan-500/10 text-cyan-300"
-                  : "text-slate-300 hover:bg-slate-800"
-                  }`}
+                className={`block w - full rounded - lg px - 4 py - 3 text - left text - sm transition ${
+  index === 0
+    ? "bg-cyan-500/10 text-cyan-300"
+    : "text-slate-300 hover:bg-slate-800"
+} `}
               >
                 {item.label}
               </a>
@@ -236,8 +271,10 @@ export default function Home() {
           </nav>
         </aside>
 
-        <section id="command-center"
-          className="min-w-0 flex-1 scroll-mt-6 p-4 sm:p-6 lg:p-8">
+        <section
+          id="command-center"
+          className="min-w-0 flex-1 scroll-mt-6 p-4 sm:p-6 lg:p-8"
+        >
           <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
               <Image
@@ -265,7 +302,8 @@ export default function Home() {
             </div>
           </header>
 
-          <section id="ask-tbone"
+          <section
+            id="ask-tbone"
             className="mb-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
           >
             <h3 className="mb-4 text-xl font-medium text-cyan-300">
@@ -281,7 +319,7 @@ export default function Home() {
 
               <button
                 type="button"
-                className="rounded-xl bg-cyan-400 px-6 font-medium text-slate-950 hover:bg-cyan-300w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
+                className="w-full rounded-xl bg-cyan-400 px-6 py-3 font-medium text-slate-950 hover:bg-cyan-300 sm:w-auto"
               >
                 Send
               </button>
@@ -315,6 +353,7 @@ export default function Home() {
                   alt="T-Bone companion"
                   width={500}
                   height={500}
+                  loading="eager"
                   className="h-64 w-full object-cover"
                 />
               </div>
@@ -354,7 +393,8 @@ export default function Home() {
           </section>
 
           <section className="mt-8 grid gap-8 xl:grid-cols-3">
-            <div id="projects"
+            <div
+              id="projects"
               className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
             >
               <div className="mb-6 flex items-center justify-between">
@@ -393,7 +433,7 @@ export default function Home() {
 
                       <div className="text-right">
                         <p
-                          className={`text-sm font-medium ${project.statusClass}`}
+                          className={`text - sm font - medium ${ project.statusClass } `}
                         >
                           {project.status}
                         </p>
@@ -406,7 +446,7 @@ export default function Home() {
                     <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-800">
                       <div
                         className="h-full rounded-full bg-cyan-400"
-                        style={{ width: `${project.progress}%` }}
+                        style={{ width: `${ project.progress }% ` }}
                       />
                     </div>
                   </div>
@@ -421,7 +461,8 @@ export default function Home() {
               </button>
             </div>
 
-            <div id="actions"
+            <div
+              id="decisions"
               className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
             >
               <div className="mb-6 flex items-center justify-between">
@@ -459,7 +500,7 @@ export default function Home() {
                       </div>
 
                       <span
-                        className={`rounded-full border px-3 py-1 text-xs font-medium ${decision.priorityClass}`}
+                        className={`rounded - full border px - 3 py - 1 text - xs font - medium ${ decision.priorityClass } `}
                       >
                         {decision.priority}
                       </span>
@@ -480,7 +521,8 @@ export default function Home() {
               </button>
             </div>
 
-            <div id="decisions"
+            <div
+              id="actions"
               className="scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
             >
               <div className="mb-6 flex items-center justify-between">
@@ -488,7 +530,9 @@ export default function Home() {
                   <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
                     Execution
                   </p>
-                  <h3 className="mt-2 text-2xl font-semibold">Open Actions</h3>
+                  <h3 className="mt-2 text-2xl font-semibold">
+                    Open Actions
+                  </h3>
                 </div>
 
                 <button
@@ -508,7 +552,7 @@ export default function Home() {
                     <div className="flex items-start gap-3">
                       <input
                         type="checkbox"
-                        aria-label={`Mark ${action.title} complete`}
+                        aria-label={`Mark ${ action.title } complete`}
                         className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-900 accent-cyan-400"
                       />
 
@@ -522,7 +566,7 @@ export default function Home() {
                       </div>
 
                       <p
-                        className={`whitespace-nowrap text-xs font-medium ${action.dueClass}`}
+                        className={`whitespace - nowrap text - xs font - medium ${ action.dueClass } `}
                       >
                         {action.due}
                       </p>
@@ -540,7 +584,10 @@ export default function Home() {
             </div>
           </section>
 
-          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <section
+            id="memories"
+            className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
+          >
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
@@ -567,7 +614,7 @@ export default function Home() {
                 >
                   <div className="flex items-start gap-4">
                     <div
-                      className={`mt-1 h-3 w-3 shrink-0 rounded-full ${memory.accentClass}`}
+                      className={`mt - 1 h - 3 w - 3 shrink - 0 rounded - full ${ memory.accentClass } `}
                     />
 
                     <div className="min-w-0 flex-1">
@@ -602,6 +649,7 @@ export default function Home() {
               Search Memory
             </button>
           </section>
+
           <section
             id="vaults"
             className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
@@ -630,13 +678,17 @@ export default function Home() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h4 className="font-medium text-slate-100">{vault.name}</h4>
+                      <h4 className="font-medium text-slate-100">
+                        {vault.name}
+                      </h4>
                       <p className="mt-2 text-sm leading-6 text-slate-400">
                         {vault.detail}
                       </p>
                     </div>
 
-                    <span className={`text-sm font-medium ${vault.statusClass}`}>
+                    <span
+                      className={`text - sm font - medium ${ vault.statusClass } `}
+                    >
                       {vault.status}
                     </span>
                   </div>
@@ -655,9 +707,62 @@ export default function Home() {
               + Create New Vault
             </button>
           </section>
-          <section id="memories"
+
+          <section
+            id="settings"
             className="mt-8 scroll-mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6"
           >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
+                  System Preferences
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold">Settings</h3>
+              </div>
+
+              <button
+                type="button"
+                className="text-sm font-medium text-cyan-300 hover:text-cyan-200"
+              >
+                Manage Settings
+              </button>
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {settings.map((setting) => (
+                <article
+                  key={setting.name}
+                  className="rounded-xl border border-slate-800 bg-slate-950 p-5"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h4 className="font-medium text-slate-100">
+                        {setting.name}
+                      </h4>
+                      <p className="mt-2 text-sm leading-6 text-slate-400">
+                        {setting.detail}
+                      </p>
+                    </div>
+
+                    <span
+                      className={`text - sm font - medium ${ setting.valueClass } `}
+                    >
+                      {setting.value}
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="mt-6 rounded-xl border border-cyan-400/30 px-5 py-3 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
+            >
+              Open Full Settings
+            </button>
+          </section>
+
+          <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
             <div className="mb-6 flex items-center justify-between">
               <div>
                 <p className="text-sm uppercase tracking-[0.25em] text-cyan-400">
@@ -679,7 +784,7 @@ export default function Home() {
             <div className="space-y-4">
               {schedule.map((meeting) => (
                 <article
-                  key={`${meeting.time}-${meeting.title}`}
+                  key={`${ meeting.time } -${ meeting.title } `}
                   className="grid gap-4 rounded-xl border border-slate-800 bg-slate-950 p-5 md:grid-cols-[110px_1fr_auto] md:items-center"
                 >
                   <div>
@@ -704,7 +809,7 @@ export default function Home() {
                   </div>
 
                   <span
-                    className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${meeting.typeClass}`}
+                    className={`w - fit rounded - full border px - 3 py - 1 text - xs font - medium ${ meeting.typeClass } `}
                   >
                     {meeting.type}
                   </span>

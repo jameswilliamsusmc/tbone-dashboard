@@ -117,6 +117,30 @@ const extractResults = (data: unknown): MemorySearchResult[] => {
   return [];
 };
 
+const getWordSet = (value: string) =>
+  new Set(
+    tokenize(value).filter(
+      (token) =>
+        token.length > 2 &&
+        !GENERIC_QUERY_TERMS.has(token),
+    ),
+  );
+
+const calculateSimilarity = (first: string, second: string) => {
+  const firstWords = getWordSet(first);
+  const secondWords = getWordSet(second);
+
+  if (firstWords.size === 0 || secondWords.size === 0) {
+    return 0;
+  }
+
+  const sharedWords = [...firstWords].filter((word) =>
+    secondWords.has(word),
+  ).length;
+
+  return sharedWords / Math.min(firstWords.size, secondWords.size);
+};
+
 const buildAnswer = (
   query: string,
   results: MemorySearchResult[],
@@ -137,11 +161,13 @@ const buildAnswer = (
   const secondaryText =
     typeof secondary?.content === "string" ? secondary.content.trim() : "";
 
-  if (
+  const isDistinctSupportingContext =
     secondaryText &&
     secondaryText !== primaryText &&
-    secondaryText.length <= 280
-  ) {
+    secondaryText.length <= 280 &&
+    calculateSimilarity(primaryText, secondaryText) < 0.45;
+
+  if (isDistinctSupportingContext) {
     return `${primaryText}\n\nSupporting context: ${secondaryText}`;
   }
 

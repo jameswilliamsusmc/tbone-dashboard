@@ -36,6 +36,24 @@ type ProjectRecord = {
   updated_at?: string;
 };
 
+type ActionRecord = {
+  id?: string;
+  title?: string;
+  content?: string;
+  memory_type?: string;
+  vault?: string;
+  project_id?: string;
+  project_name?: string;
+  tags?: string[];
+  source?: string;
+  status?: string;
+  sensitivity?: string;
+  importance?: number;
+  effective_date?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 const formatMemoryLabel = (value?: string) => {
   if (!value) {
     return "Memory";
@@ -155,7 +173,7 @@ const decisions = [
   },
 ];
 
-const actions = [
+const fallbackActions = [
   {
     title: "Review NGA Defender budget draft",
     project: "NGA Defender",
@@ -341,6 +359,9 @@ export default function Home() {
   const [activeProjectsError, setActiveProjectsError] = useState("");
   const [isLoadingActiveProjects, setIsLoadingActiveProjects] =
     useState(true);
+  const [openActions, setOpenActions] = useState<ActionRecord[]>([]);
+  const [openActionsError, setOpenActionsError] = useState("");
+  const [isLoadingOpenActions, setIsLoadingOpenActions] = useState(true);
 
   const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -390,6 +411,42 @@ export default function Home() {
       setIsAsking(false);
     }
   };
+
+  useEffect(() => {
+    const loadOpenActions = async () => {
+      setIsLoadingOpenActions(true);
+      setOpenActionsError("");
+
+      try {
+        const response = await fetch("/api/actions", {
+          cache: "no-store",
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          actions?: ActionRecord[];
+        };
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ?? "T-Bone could not retrieve open actions.",
+          );
+        }
+
+        setOpenActions(Array.isArray(data.actions) ? data.actions : []);
+      } catch (error) {
+        setOpenActionsError(
+          error instanceof Error
+            ? error.message
+            : "T-Bone could not retrieve open actions.",
+        );
+      } finally {
+        setIsLoadingOpenActions(false);
+      }
+    };
+
+    void loadOpenActions();
+  }, []);
 
   useEffect(() => {
     const loadActiveProjects = async () => {
@@ -1059,35 +1116,111 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="space-y-3">
-                {actions.map((action) => (
-                  <div
-                    key={action.title}
-                    className="rounded-xl border border-slate-800 bg-slate-950 p-4"
-                  >
-                    <div className="flex items-start gap-3">
-                      <input
-                        type="checkbox"
-                        aria-label={`Mark ${action.title} complete`}
-                        className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-900 accent-cyan-400"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-slate-100">
-                          {action.title}
-                        </h4>
-                        <p className="mt-1 text-sm text-slate-500">
-                          Project: {action.project}
-                        </p>
-                      </div>
-                      <p
-                        className={`whitespace-nowrap text-xs font-medium ${action.dueClass}`}
+              {isLoadingOpenActions && (
+                <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">
+                  Loading open actions...
+                </div>
+              )}
+
+              {openActionsError && (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-5"
+                >
+                  <p className="text-sm font-medium text-amber-200">
+                    {openActionsError}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Showing the local sample actions for now.
+                  </p>
+                </div>
+              )}
+
+              {!isLoadingOpenActions && (
+                <div className="space-y-3">
+                  {(openActions.length > 0
+                    ? openActions
+                    : fallbackActions
+                  ).map((action, index) => {
+                    const isLiveAction = "content" in action;
+                    const liveAction = action as ActionRecord;
+                    const fallbackAction =
+                      action as (typeof fallbackActions)[number];
+
+                    const title = isLiveAction
+                      ? liveAction.title ?? "Untitled action"
+                      : fallbackAction.title;
+                    const detail = isLiveAction
+                      ? liveAction.content ?? "No action details available."
+                      : `Project: ${fallbackAction.project}`;
+                    const context = isLiveAction
+                      ? liveAction.project_name ??
+                        formatMemoryLabel(liveAction.vault)
+                      : fallbackAction.project;
+                    const status = isLiveAction
+                      ? formatMemoryLabel(liveAction.status ?? "active")
+                      : fallbackAction.due;
+                    const updated = isLiveAction
+                      ? formatMemoryDate(
+                          liveAction.updated_at ??
+                            liveAction.created_at ??
+                            liveAction.effective_date,
+                        )
+                      : fallbackAction.due;
+
+                    return (
+                      <article
+                        key={liveAction.id ?? `${title}-${index}`}
+                        className="rounded-xl border border-slate-800 bg-slate-950 p-4"
                       >
-                        {action.due}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                        <div className="flex items-start gap-3">
+                          <input
+                            type="checkbox"
+                            aria-label={`Mark ${title} complete`}
+                            className="mt-1 h-4 w-4 rounded border-slate-600 bg-slate-900 accent-cyan-400"
+                          />
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-start justify-between gap-3">
+                              <h4 className="font-medium text-slate-100">
+                                {title}
+                              </h4>
+
+                              <span className="rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-300">
+                                {status}
+                              </span>
+                            </div>
+
+                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                              {detail}
+                            </p>
+
+                            {isLiveAction &&
+                              Array.isArray(liveAction.tags) &&
+                              liveAction.tags.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  {liveAction.tags.slice(0, 4).map((tag) => (
+                                    <span
+                                      key={tag}
+                                      className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-500"
+                                    >
+                                      {tag}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+
+                            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                              <span>{context}</span>
+                              <span>{updated}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
 
               <button
                 type="button"

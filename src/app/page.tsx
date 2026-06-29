@@ -54,6 +54,24 @@ type ActionRecord = {
   updated_at?: string;
 };
 
+type DecisionRecord = {
+  id?: string;
+  title?: string;
+  content?: string;
+  memory_type?: string;
+  vault?: string;
+  project_id?: string;
+  project_name?: string;
+  tags?: string[];
+  source?: string;
+  status?: string;
+  sensitivity?: string;
+  importance?: number;
+  effective_date?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
 const formatMemoryLabel = (value?: string) => {
   if (!value) {
     return "Memory";
@@ -149,7 +167,7 @@ const fallbackProjects = [
   },
 ];
 
-const decisions = [
+const fallbackDecisions = [
   {
     title: "NGA Defender — Approve Phase 2 Budget",
     detail: "$2.4M budget allocation for FY25 implementation.",
@@ -362,6 +380,11 @@ export default function Home() {
   const [openActions, setOpenActions] = useState<ActionRecord[]>([]);
   const [openActionsError, setOpenActionsError] = useState("");
   const [isLoadingOpenActions, setIsLoadingOpenActions] = useState(true);
+  const [importantDecisions, setImportantDecisions] =
+    useState<DecisionRecord[]>([]);
+  const [importantDecisionsError, setImportantDecisionsError] = useState("");
+  const [isLoadingImportantDecisions, setIsLoadingImportantDecisions] =
+    useState(true);
 
   const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -411,6 +434,44 @@ export default function Home() {
       setIsAsking(false);
     }
   };
+
+  useEffect(() => {
+    const loadImportantDecisions = async () => {
+      setIsLoadingImportantDecisions(true);
+      setImportantDecisionsError("");
+
+      try {
+        const response = await fetch("/api/decisions", {
+          cache: "no-store",
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          decisions?: DecisionRecord[];
+        };
+
+        if (!response.ok) {
+          throw new Error(
+            data.error ?? "T-Bone could not retrieve important decisions.",
+          );
+        }
+
+        setImportantDecisions(
+          Array.isArray(data.decisions) ? data.decisions : [],
+        );
+      } catch (error) {
+        setImportantDecisionsError(
+          error instanceof Error
+            ? error.message
+            : "T-Bone could not retrieve important decisions.",
+        );
+      } finally {
+        setIsLoadingImportantDecisions(false);
+      }
+    };
+
+    void loadImportantDecisions();
+  }, []);
 
   useEffect(() => {
     const loadOpenActions = async () => {
@@ -1059,33 +1120,116 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {decisions.map((decision) => (
-                  <div
-                    key={decision.title}
-                    className="rounded-xl border border-slate-800 bg-slate-950 p-5"
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h4 className="font-medium text-slate-100">
-                          {decision.title}
-                        </h4>
-                        <p className="mt-2 text-sm text-slate-400">
-                          {decision.detail}
-                        </p>
-                      </div>
-                      <span
-                        className={`rounded-full border px-3 py-1 text-xs font-medium ${decision.priorityClass}`}
+              {isLoadingImportantDecisions && (
+                <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">
+                  Loading important decisions...
+                </div>
+              )}
+
+              {importantDecisionsError && (
+                <div
+                  role="alert"
+                  className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-5"
+                >
+                  <p className="text-sm font-medium text-amber-200">
+                    {importantDecisionsError}
+                  </p>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Showing the local sample decisions for now.
+                  </p>
+                </div>
+              )}
+
+              {!isLoadingImportantDecisions && (
+                <div className="space-y-4">
+                  {(importantDecisions.length > 0
+                    ? importantDecisions
+                    : fallbackDecisions
+                  ).map((decision, index) => {
+                    const isLiveDecision = "content" in decision;
+                    const liveDecision = decision as DecisionRecord;
+                    const fallbackDecision =
+                      decision as (typeof fallbackDecisions)[number];
+
+                    const title = isLiveDecision
+                      ? liveDecision.title ?? "Untitled decision"
+                      : fallbackDecision.title;
+                    const detail = isLiveDecision
+                      ? liveDecision.content ??
+                        "No decision details available."
+                      : fallbackDecision.detail;
+                    const context = isLiveDecision
+                      ? liveDecision.project_name ??
+                        formatMemoryLabel(liveDecision.vault)
+                      : fallbackDecision.due;
+                    const priority = isLiveDecision
+                      ? (liveDecision.importance ?? 0) >= 0.9
+                        ? "High"
+                        : (liveDecision.importance ?? 0) >= 0.75
+                          ? "Medium"
+                          : "Standard"
+                      : fallbackDecision.priority;
+                    const priorityClass = isLiveDecision
+                      ? priority === "High"
+                        ? "border-amber-400/30 bg-amber-400/10 text-amber-300"
+                        : priority === "Medium"
+                          ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
+                          : "border-slate-700 bg-slate-900 text-slate-300"
+                      : fallbackDecision.priorityClass;
+                    const updated = isLiveDecision
+                      ? formatMemoryDate(
+                          liveDecision.updated_at ??
+                            liveDecision.created_at ??
+                            liveDecision.effective_date,
+                        )
+                      : fallbackDecision.due;
+
+                    return (
+                      <article
+                        key={liveDecision.id ?? `${title}-${index}`}
+                        className="rounded-xl border border-slate-800 bg-slate-950 p-5"
                       >
-                        {decision.priority}
-                      </span>
-                    </div>
-                    <p className="mt-4 text-xs uppercase tracking-wide text-slate-500">
-                      {decision.due}
-                    </p>
-                  </div>
-                ))}
-              </div>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-medium text-slate-100">
+                              {title}
+                            </h4>
+                            <p className="mt-2 text-sm leading-6 text-slate-400">
+                              {detail}
+                            </p>
+                          </div>
+
+                          <span
+                            className={`rounded-full border px-3 py-1 text-xs font-medium ${priorityClass}`}
+                          >
+                            {priority}
+                          </span>
+                        </div>
+
+                        {isLiveDecision &&
+                          Array.isArray(liveDecision.tags) &&
+                          liveDecision.tags.length > 0 && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {liveDecision.tags.slice(0, 5).map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded-full border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-slate-500"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
+                        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-500">
+                          <span>{context}</span>
+                          <span>{updated}</span>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              )}
 
               <button
                 type="button"

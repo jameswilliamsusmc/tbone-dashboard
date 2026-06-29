@@ -72,6 +72,18 @@ type DecisionRecord = {
   updated_at?: string;
 };
 
+type CalendarEvent = {
+  id?: string;
+  title?: string;
+  description?: string;
+  location?: string;
+  start?: string;
+  end?: string;
+  allDay?: boolean;
+  status?: string;
+  htmlLink?: string;
+};
+
 const formatMemoryLabel = (value?: string) => {
   if (!value) {
     return "Memory";
@@ -97,6 +109,45 @@ const formatMemoryDate = (value?: string) => {
     month: "short",
     day: "numeric",
     year: "numeric",
+  }).format(date);
+};
+
+const formatCalendarTime = (value?: string, allDay?: boolean) => {
+  if (!value) {
+    return "";
+  }
+
+  if (allDay) {
+    return "All day";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(date);
+};
+
+const formatCalendarDay = (value?: string) => {
+  if (!value) {
+    return "";
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
   }).format(date);
 };
 
@@ -321,7 +372,7 @@ const settings = [
   },
 ];
 
-const schedule = [
+const fallbackSchedule = [
   {
     time: "9:00 AM",
     endTime: "9:30 AM",
@@ -385,6 +436,10 @@ export default function Home() {
   const [importantDecisionsError, setImportantDecisionsError] = useState("");
   const [isLoadingImportantDecisions, setIsLoadingImportantDecisions] =
     useState(true);
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [calendarError, setCalendarError] = useState("");
+  const [isLoadingCalendar, setIsLoadingCalendar] = useState(true);
+  const [calendarConnectUrl, setCalendarConnectUrl] = useState("");
 
   const handleAskTbone = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -434,6 +489,50 @@ export default function Home() {
       setIsAsking(false);
     }
   };
+
+  useEffect(() => {
+    const loadCalendarEvents = async () => {
+      setIsLoadingCalendar(true);
+      setCalendarError("");
+      setCalendarConnectUrl("");
+
+      try {
+        const response = await fetch("/api/calendar/events", {
+          cache: "no-store",
+        });
+
+        const data = (await response.json()) as {
+          error?: string;
+          connectUrl?: string;
+          events?: CalendarEvent[];
+        };
+
+        if (!response.ok) {
+          if (data.connectUrl) {
+            setCalendarConnectUrl(data.connectUrl);
+          }
+
+          throw new Error(
+            data.error ?? "T-Bone could not retrieve calendar events.",
+          );
+        }
+
+        setCalendarEvents(
+          Array.isArray(data.events) ? data.events : [],
+        );
+      } catch (error) {
+        setCalendarError(
+          error instanceof Error
+            ? error.message
+            : "T-Bone could not retrieve calendar events.",
+        );
+      } finally {
+        setIsLoadingCalendar(false);
+      }
+    };
+
+    void loadCalendarEvents();
+  }, []);
 
   useEffect(() => {
     const loadImportantDecisions = async () => {
@@ -1625,7 +1724,7 @@ export default function Home() {
                   Calendar
                 </p>
                 <h3 className="mt-2 text-2xl font-semibold">
-                  Today&apos;s Schedule
+                  Upcoming Schedule
                 </h3>
               </div>
               <button
@@ -1636,39 +1735,134 @@ export default function Home() {
               </button>
             </div>
 
-            <div className="space-y-4">
-              {schedule.map((meeting) => (
-                <article
-                  key={`${meeting.time}-${meeting.title}`}
-                  className="grid gap-4 rounded-xl border border-slate-800 bg-slate-950 p-5 md:grid-cols-[110px_1fr_auto] md:items-center"
-                >
-                  <div>
-                    <p className="font-semibold text-cyan-300">
-                      {meeting.time}
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500">
-                      {meeting.endTime}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-slate-100">
-                      {meeting.title}
-                    </h4>
-                    <p className="mt-2 text-sm text-slate-400">
-                      {meeting.detail}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                      {meeting.location}
-                    </p>
-                  </div>
-                  <span
-                    className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${meeting.typeClass}`}
+            {isLoadingCalendar && (
+              <div className="rounded-xl border border-slate-800 bg-slate-950 p-5 text-sm text-slate-400">
+                Loading Google Calendar events...
+              </div>
+            )}
+
+            {calendarError && (
+              <div
+                role="alert"
+                className="rounded-xl border border-amber-400/30 bg-amber-400/10 p-5"
+              >
+                <p className="text-sm font-medium text-amber-200">
+                  {calendarError}
+                </p>
+
+                {calendarConnectUrl && (
+                  <a
+                    href={calendarConnectUrl}
+                    className="mt-3 inline-flex rounded-lg border border-cyan-400/30 px-4 py-2 text-sm font-medium text-cyan-300 hover:bg-cyan-400/10"
                   >
-                    {meeting.type}
-                  </span>
-                </article>
-              ))}
-            </div>
+                    Connect Google Calendar
+                  </a>
+                )}
+
+                {!calendarConnectUrl && (
+                  <p className="mt-2 text-xs text-slate-400">
+                    Showing the local sample schedule for now.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {!isLoadingCalendar && (
+              <div className="space-y-4">
+                {(calendarEvents.length > 0
+                  ? calendarEvents
+                  : fallbackSchedule
+                ).map((meeting, index) => {
+                  const isLiveEvent = "start" in meeting;
+                  const liveEvent = meeting as CalendarEvent;
+                  const fallbackMeeting =
+                    meeting as (typeof fallbackSchedule)[number];
+
+                  const title = isLiveEvent
+                    ? liveEvent.title ?? "Untitled event"
+                    : fallbackMeeting.title;
+                  const detail = isLiveEvent
+                    ? liveEvent.description ||
+                      "No event description provided."
+                    : fallbackMeeting.detail;
+                  const location = isLiveEvent
+                    ? liveEvent.location || "Location not specified"
+                    : fallbackMeeting.location;
+                  const startTime = isLiveEvent
+                    ? formatCalendarTime(
+                        liveEvent.start,
+                        liveEvent.allDay,
+                      )
+                    : fallbackMeeting.time;
+                  const endTime = isLiveEvent
+                    ? formatCalendarTime(
+                        liveEvent.end,
+                        liveEvent.allDay,
+                      )
+                    : fallbackMeeting.endTime;
+                  const day = isLiveEvent
+                    ? formatCalendarDay(liveEvent.start)
+                    : "Today";
+                  const type = isLiveEvent
+                    ? liveEvent.allDay
+                      ? "All Day"
+                      : "Calendar"
+                    : fallbackMeeting.type;
+                  const typeClass = isLiveEvent
+                    ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-300"
+                    : fallbackMeeting.typeClass;
+
+                  return (
+                    <article
+                      key={liveEvent.id ?? `${title}-${index}`}
+                      className="grid gap-4 rounded-xl border border-slate-800 bg-slate-950 p-5 md:grid-cols-[130px_1fr_auto] md:items-center"
+                    >
+                      <div>
+                        <p className="font-semibold text-cyan-300">
+                          {startTime}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {endTime}
+                        </p>
+                        <p className="mt-2 text-xs uppercase tracking-wide text-slate-600">
+                          {day}
+                        </p>
+                      </div>
+
+                      <div className="min-w-0">
+                        {isLiveEvent && liveEvent.htmlLink ? (
+                          <a
+                            href={liveEvent.htmlLink}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="font-medium text-slate-100 hover:text-cyan-300"
+                          >
+                            {title}
+                          </a>
+                        ) : (
+                          <h4 className="font-medium text-slate-100">
+                            {title}
+                          </h4>
+                        )}
+
+                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                          {detail}
+                        </p>
+                        <p className="mt-2 text-xs text-slate-500">
+                          {location}
+                        </p>
+                      </div>
+
+                      <span
+                        className={`w-fit rounded-full border px-3 py-1 text-xs font-medium ${typeClass}`}
+                      >
+                        {type}
+                      </span>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
 
             <button
               type="button"

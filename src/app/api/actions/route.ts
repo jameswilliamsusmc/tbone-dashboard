@@ -87,6 +87,8 @@ export async function GET() {
     }
 
     const actions = extractActions(data)
+    
+      .filter((action) => action.status === "active")
       .sort((first, second) => getActionTime(second) - getActionTime(first))
       .slice(0, 10);
 
